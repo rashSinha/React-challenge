@@ -4,7 +4,7 @@ import ErrorMessage from "./ErrorMessage";
 import { getArtist } from "../services/spotify";
 import placeholder from "../assets/placeholder.png";
 
-const Artist = ({ artistId }) => {
+const ArtistInfo = ({ artistId }) => {
   const [loading, setLoading] = useState(true);
   const [artist, setArtist] = useState(null);
 
@@ -12,6 +12,7 @@ const Artist = ({ artistId }) => {
     fetchArtist();
   }, []);
 
+  // fetch artist detail from spotify api with artistId
   const fetchArtist = async () => {
     setLoading(true);
     try {
@@ -50,4 +51,4 @@ const Artist = ({ artistId }) => {
   );
 };
 
-export default Artist;
+export default ArtistInfo;
