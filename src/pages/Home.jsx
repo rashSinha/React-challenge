@@ -1,16 +1,56 @@
-import React from 'react';
-import Card from '../components/Card';
-import dummyData from "../dummyData.json"; // To be replaced with your api response data
-
+import React, { useState, useEffect } from "react";
+import Filter from "../components/Filter";
+import ArtistCard from "../components/ArtistCard";
+import Loading from "../components/Loading";
+import ErrorMessage from "../components/ErrorMessage";
+import { search } from "../services/spotify";
 
 export const Home = () => {
+  const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const [artists, setArtists] = useState([]);
+
+  useEffect(() => {
+    fetchArtists();
+  }, []);
+
+  // fetch artists from Spotify API using search filters
+  const fetchArtists = async () => {
+    setLoading(true);
+    setArtists([]);
+    try {
+      const { data } = await search(searchText);
+      setArtists(data.artists.items);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  };
+
   return (
-    <>
-      <h1>Space X Ships</h1>
-      <div className="App" style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr", rowGap: "10px", columnGap: "20px"}}>
-        <Card image={dummyData.image} name={dummyData.name} home_port={dummyData.home_port} roles={dummyData.roles} />
-      </div>
-    </>
+    <div>
+      <Filter
+        searchText={searchText}
+        onTextChange={(e) => {
+          setSearchText(e.target.value);
+        }}
+        onSubmit={fetchArtists}
+      />
+      {loading && <Loading />}
+      {!loading && artists.length > 0 && (
+        <>
+          <h1 className="section-title">Top artists</h1>
+          <div className="artists-container">
+            {artists.map((artist) => (
+              <ArtistCard key={artist.id} artist={artist} />
+            ))}
+          </div>
+        </>
+      )}
+      {!loading && artists.length === 0 && (
+        <ErrorMessage message="No artist found, try searching for another." />
+      )}
+    </div>
   );
 };
 
